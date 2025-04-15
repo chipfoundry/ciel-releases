@@ -1,0 +1,38 @@
+name: CI
+
+# Events that trigger workflow
+on:
+  workflow_dispatch:
+  
+jobs:
+  cache:
+    name: Cache API Calls
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: |
+          pip3 install git+https://github.com/fossi-foundation/ciel@data_source
+      - name: Cache API
+        run: |
+          export GITHUB_TOKEN=${{ secrets.BOT_TOKEN }}
+          python3 ./cache_api.py -O cache efabless/volare
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: cache
+  deploy:
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: cache
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

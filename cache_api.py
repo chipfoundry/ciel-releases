@@ -20,17 +20,21 @@ from pathlib import Path
 from ciel.source import GitHubReleasesDataSource
 from ciel.common import mkdirp, date_to_iso8601
 
-parser = argparse.ArgumentParser(description="A program that takes an output directory and a single input.")
+parser = argparse.ArgumentParser(
+    description="A program that takes an output directory and a single input."
+)
 parser.add_argument("-O", "--output_dir", help="The directory to write output to")
-parser.add_argument("target_repo", help="The target input repo (in the format <owner>/<repo>)")
+parser.add_argument(
+    "target_repo", help="The target input repo (in the format <owner>/<repo>)"
+)
 
 args = parser.parse_args()
 
 download_path = Path(args.output_dir)
 data_source = GitHubReleasesDataSource(args.target_repo)
-for pdk in ["sky130", "gf180mcu", "ihp_sg13g2"]:
+for pdk in ["sky130", "gf180mcu", "ihp-sg13g2"]:
     versions = data_source.get_available_versions(pdk)
-    base =  download_path / pdk
+    base = download_path / pdk
     mkdirp(base)
     manifest_versions = []
     for version in versions:
@@ -41,18 +45,11 @@ for pdk in ["sky130", "gf180mcu", "ihp_sg13g2"]:
         if version.prerelease:
             entry["prerelease"] = True
         manifest_versions.append(entry)
-    manifest = {
-        "version": 1,
-        "pdk": pdk,
-        "versions": manifest_versions
-    }
+    manifest = {"version": 1, "pdk": pdk, "versions": manifest_versions}
     with open(base / "manifest.json", "w") as f:
         json.dump(manifest, f)
     for version in versions:
-        version_manifest = {
-            "version": 1,
-            "assets": []
-        }
+        version_manifest = {"version": 1, "assets": []}
         version_base = base / version.name
         mkdirp(version_base)
         _, assets = data_source.get_downloads_for_version(version)

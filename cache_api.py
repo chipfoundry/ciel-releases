@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 import json
 import argparse
 
@@ -32,7 +31,7 @@ args = parser.parse_args()
 
 download_path = Path(args.output_dir)
 data_source = GitHubReleasesDataSource(args.target_repo)
-for pdk in ["sky130", "gf180mcu", "ihp-sg13g2"]:
+for pdk in ["sky130"]:
     versions = data_source.get_available_versions(pdk)
     base = download_path / pdk
     mkdirp(base)

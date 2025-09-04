@@ -3,8 +3,6 @@ name: CI
 # Events that trigger workflow
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * *"
 
 jobs:
   cache:
@@ -15,11 +13,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Dependencies
         run: |
-          python3 -m pip install "ciel>=2.0.4"
+          python3 -m pip install "ciel>=2.1.4"
       - name: Cache API
         run: |
-          export GITHUB_TOKEN=${{ secrets.BOT_TOKEN }}
-          python3 ./cache_api.py -O cache fossi-foundation/ciel-releases
+          export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          python3 ./cache_api.py -O cache chipfoundry/ciel-releases
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
